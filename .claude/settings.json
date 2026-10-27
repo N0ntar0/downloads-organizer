@@ -1,0 +1,34 @@
+{
+  "_comment": "プロジェクト共通ルールの単一ソースはリポジトリ直下の AGENTS.md です。このファイルには Claude Code 固有設定だけを記載します。Push・PR作成・作業ブランチ削除はaskで確認し、その承認を人間の明示的な許可として扱います（docs/ai/git-operations.md の「承認の受け取り方」）。PRマージと危険な履歴操作はdenyです。",
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "PowerShell(.\\scripts\\verify.ps1)",
+      "PowerShell(.\\tests\\run-tests.ps1)",
+      "Bash(powershell.exe -NoProfile -File scripts/verify.ps1)",
+      "Bash(powershell.exe -NoProfile -File tests/run-tests.ps1)"
+    ],
+    "ask": [
+      "Bash(git push)",
+      "Bash(git push:*)",
+      "Bash(gh pr create)",
+      "Bash(gh pr create:*)",
+      "Bash(git branch -d:*)",
+      "PowerShell(git push)",
+      "PowerShell(git push:*)",
+      "PowerShell(gh pr create)",
+      "PowerShell(gh pr create:*)",
+      "PowerShell(git branch -d:*)"
+    ],
+    "deny": [
+      "Bash(gh pr merge:*)",
+      "Bash(git reset --hard:*)",
+      "Bash(git branch -D:*)",
+      "Bash(gh api -X DELETE:*)",
+      "PowerShell(gh pr merge:*)",
+      "PowerShell(git reset --hard:*)",
+      "PowerShell(git branch -D:*)",
+      "PowerShell(gh api -X DELETE:*)"
+    ]
+  }
+}

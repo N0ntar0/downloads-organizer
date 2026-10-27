@@ -1,0 +1,22 @@
+root = true
+
+[*]
+indent_style = space
+indent_size = 2
+end_of_line = lf
+charset = utf-8
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Windows PowerShell 5.1 で読むため、BOM 付き UTF-8 と CRLF にする
+[*.{ps1,json}]
+indent_size = 4
+end_of_line = crlf
+charset = utf-8-bom
+
+[*.json]
+indent_size = 2
+charset = utf-8
+
+[.githooks/*]
+end_of_line = lf
