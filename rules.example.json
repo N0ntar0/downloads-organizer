@@ -2,6 +2,8 @@
   "minAgeHours": 24,
   "staleDays": 30,
   "suggestMinFiles": 3,
+  "reviewFolder": "00_整理\\要確認",
+  "trashFolder": "00_整理\\削除候補",
   "skipNames": ["desktop.ini"],
   "inProgressExtensions": [".crdownload", ".part", ".partial", ".download", ".tmp"],
   "deleteCandidateExtensions": [".exe", ".msi", ".vsixpackage"],

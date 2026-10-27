@@ -1,6 +1,6 @@
 ﻿# ダウンロードフォルダ整理スクリプト
 #   ルールは同じフォルダの rules.json に書く（なければ rules.example.json から作る）。
-#   自信のないものは 00_要確認、捨ててよさそうなものは 01_削除候補 へ移す（削除はしない）。
+#   自信のないものは要確認、捨ててよさそうなものは削除候補へ移す（削除はしない）。
 param(
     [string]$Root = (Join-Path $env:USERPROFILE 'Downloads'),
     [switch]$DryRun,
@@ -11,13 +11,6 @@ $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 $rulesPath = Join-Path $here 'rules.json'
 $logPath = Join-Path $here 'logs\移動ログ.csv'
 
-$ReviewName = '00_要確認'
-$TrashName = '01_削除候補'
-$ReviewDir = Join-Path $Root $ReviewName
-$TrashDir = Join-Path $Root $TrashName
-$ReviewCsv = Join-Path $ReviewDir '_一覧.csv'
-$TrashCsv = Join-Path $TrashDir '_一覧.csv'
-$SuggestCsv = Join-Path $ReviewDir '_新フォルダ提案.csv'
 $ReviewCols = 'ファイル名', '理由', '候補の行き先', '移動日', '振り分け先'
 $TrashCols = 'ファイル名', '理由', 'サイズMB', '移動日'
 $SuggestCols = '提案フォルダ', 'キーワード', '件数', '例', '採用'
@@ -123,6 +116,15 @@ $moves = @(); $warnings = @(); $skippedNew = 0
 if (-not (Test-Path -LiteralPath $rulesPath)) { Copy-Item -LiteralPath (Join-Path $here 'rules.example.json') -Destination $rulesPath }
 $R = Read-Text $rulesPath | ConvertFrom-Json
 
+# 要確認・削除候補の場所（ダウンロードからの相対パス。下の階層にも置ける）
+$ReviewName = '00_整理\要確認'; if ($R.reviewFolder) { $ReviewName = $R.reviewFolder.Trim('\') }
+$TrashName = '00_整理\削除候補'; if ($R.trashFolder) { $TrashName = $R.trashFolder.Trim('\') }
+$ReviewDir = Join-Path $Root $ReviewName
+$TrashDir = Join-Path $Root $TrashName
+$ReviewCsv = Join-Path $ReviewDir '_一覧.csv'
+$TrashCsv = Join-Path $TrashDir '_一覧.csv'
+$SuggestCsv = Join-Path $ReviewDir '_新フォルダ提案.csv'
+
 # 1. 新フォルダ提案のうち「採用」に印があるものをルールへ追加
 $adopted = @()
 foreach ($s in (Read-Csv $SuggestCsv)) {
@@ -135,7 +137,7 @@ foreach ($s in (Read-Csv $SuggestCsv)) {
     else { $R.keywordCategories += [pscustomobject]@{ folder = $folder; strong = $kw; weak = @() } }
     $adopted += $folder
 }
-$managed = @($ReviewName, $TrashName, $R.fontFolder) + @($R.otherFolders) +
+$managed = @(($ReviewName -split '\\')[0], ($TrashName -split '\\')[0], $R.fontFolder) + @($R.otherFolders) +
     @($R.keywordCategories | ForEach-Object { $_.folder }) + @($R.extensionCategories | ForEach-Object { $_.folder })
 # 拡張子だけで振り分けた「書類」「画像」などは、話題別フォルダの提案元・移動元になる
 $typeDirs = @($R.extensionCategories | ForEach-Object { Join-Path $Root $_.folder } | Where-Object { Test-Path -LiteralPath $_ })
@@ -159,7 +161,7 @@ if (Test-Path -LiteralPath $ReviewDir) {
         $target = ''
         if ($row) { $target = "$($row.振り分け先)".Trim().Trim('\') }
         if ($target -and $target -notmatch '\.\.') {
-            if ($target -in '削除', '削除候補', $TrashName) { $target = $TrashName }
+            if ($target -in '削除', '削除候補', $TrashName, (Split-Path $TrashName -Leaf)) { $target = $TrashName }
             $top = ($target -split '\\')[0]
             if ($managed -notcontains $top) { $R.otherFolders = @(@($R.otherFolders) + $top); $managed += $top; Save-Rules }
             Move-To $it $target '手動で振り分け' | Out-Null
@@ -261,7 +263,7 @@ else { $lines += '移動するファイルはありませんでした。' }
 if ($skippedNew) { $lines += "新しいファイル $skippedNew 件は次回に回しました（$($R.minAgeHours) 時間以内・ダウンロード中）。" }
 if ($adopted) { $lines += "新しいフォルダをルールに追加：$($adopted -join '、')" }
 if ($reviewRows.Count) { $lines += "要確認に $($reviewRows.Count) 件あります。" }
-if ($suggestions.Count) { $lines += "新フォルダの提案が $($suggestions.Count) 件あります（00_要確認\_新フォルダ提案.csv）。" }
+if ($suggestions.Count) { $lines += "新フォルダの提案が $($suggestions.Count) 件あります（$ReviewName\_新フォルダ提案.csv）。" }
 if ($stale.Count) { $lines += "削除候補に $($R.staleDays) 日以上置いてあるもの：$($stale.Count) 件／約 $staleMB MB" }
 $lines += $warnings
 $summary = $lines -join "`r`n"
