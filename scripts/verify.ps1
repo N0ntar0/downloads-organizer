@@ -36,6 +36,20 @@ try {
                 catch { throw "${f}: JSON として読めません" }
             }
         }
+        'check:docs' = {
+            # Markdown 内の相対リンク先が実在するか（http・アンカーだけのリンクは対象外）
+            $bad = @(foreach ($f in @($tracked | Where-Object { $_ -like '*.md' })) {
+                $dir = Split-Path -Parent (Resolve-Path -LiteralPath $f)
+                $text = [IO.File]::ReadAllText((Resolve-Path -LiteralPath $f), [Text.Encoding]::UTF8)
+                foreach ($m in [regex]::Matches($text, '\]\(([^)\s]+)\)')) {
+                    $target = $m.Groups[1].Value
+                    if ($target -match '^(https?:|mailto:|#)') { continue }
+                    $path = ($target -split '#')[0]
+                    if ($path -and -not (Test-Path -LiteralPath (Join-Path $dir $path))) { "${f} → $target" }
+                }
+            })
+            if ($bad) { throw "リンク先が見つかりません: $($bad -join ', ')" }
+        }
         'check:hooks-lf' = {
             $bad = @($tracked | Where-Object { $_ -like '.githooks/*' } | Where-Object {
                 [IO.File]::ReadAllText((Resolve-Path -LiteralPath $_)).Contains("`r")
