@@ -1,0 +1,31 @@
+#!/bin/sh
+
+if [ "${ALLOW_PROTECTED_PUSH:-}" = "1" ]; then
+  exit 0
+fi
+
+zero='0000000000000000000000000000000000000000'
+
+while read -r _local_ref local_sha remote_ref _remote_sha; do
+  case "$remote_ref" in
+    refs/heads/main) ;;
+    *) continue ;;
+  esac
+
+  branch=${remote_ref#refs/heads/}
+
+  if [ "$local_sha" = "$zero" ]; then
+    action="削除"
+  else
+    action="直接Push"
+  fi
+
+  printf '%s\n' \
+    "エラー: $branch ブランチへの$action は許可されていません。" \
+    "$branch はPull RequestのMergeによってのみ更新します。" \
+    "docs/git-workflow.md のブランチ構成と、docs/ai/git-operations.md の承認境界を参照してください。" \
+    "GitHub側でもブランチ保護により拒否されます。" >&2
+  exit 1
+done
+
+exit 0
