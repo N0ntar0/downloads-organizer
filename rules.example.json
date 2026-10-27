@@ -1,0 +1,28 @@
+{
+  "minAgeHours": 24,
+  "staleDays": 30,
+  "suggestMinFiles": 3,
+  "skipNames": ["desktop.ini"],
+  "inProgressExtensions": [".crdownload", ".part", ".partial", ".download", ".tmp"],
+  "deleteCandidateExtensions": [".exe", ".msi", ".vsixpackage"],
+  "sensitiveExactNames": [".env", "env"],
+  "sensitiveKeywords": ["auth", "secret", "credential", "recovery-code", "service_account", "token", "password", "パスワード", ".pem", ".key"],
+  "fontFolder": "フォント",
+  "fontNames": ["Noto_Sans", "Noto_Serif", "Inter", "Roboto", "Poppins", "M_PLUS", "Kosugi"],
+  "fontExtensions": [".ttf", ".otf", ".woff", ".woff2"],
+  "otherFolders": ["その他"],
+  "keywordCategories": [
+    {
+      "folder": "授業",
+      "strong": ["時間割", "履修", "シラバス", "レポート", "課題"],
+      "weak": ["講義", "テスト"]
+    }
+  ],
+  "extensionCategories": [
+    { "folder": "書類", "extensions": [".pdf", ".docx", ".doc", ".xlsx", ".xlsm", ".xls", ".pptx", ".ppt", ".csv", ".txt", ".md"] },
+    { "folder": "画像", "extensions": [".png", ".jpg", ".jpeg", ".webp", ".svg", ".psd", ".nef", ".gif", ".tif", ".tiff", ".jfif", ".heic"] },
+    { "folder": "動画・音声", "extensions": [".mp4", ".m4a", ".mp3", ".wav", ".mov"] },
+    { "folder": "アーカイブ（zip）", "extensions": [".zip", ".7z", ".rar"] }
+  ],
+  "stopwords": ["資料", "コピー", "テンプレ", "テンプレート", "無題", "新規", "録音", "画像", "動画", "ファイル", "スクリーンショット", "画面収録", "一覧", "最新", "修正", "修正版", "改訂版", "完成版", "原稿", "令和", "copy", "final", "image", "screenshot", "untitled", "download", "drive", "export", "merged", "the", "and", "for", "ver", "img", "dsc", "pdf", "png", "jpg"]
+}
