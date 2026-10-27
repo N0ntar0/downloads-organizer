@@ -196,6 +196,16 @@ CSV は Excel で上書き保存してかまいません（文字コードが Sh
 **スクリプトを編集したら文字化けのエラーが出る**
 Windows PowerShell 5.1 は BOM なしの UTF-8 を正しく読めません。`.ps1` は「UTF-8（BOM 付き）」で保存してください。
 
+## 開発に参加する
+
+変更は Issue を起点に、作業ブランチと Pull Request で行います。`main` へ直接 Push することはできません。手順は [CONTRIBUTING.md](CONTRIBUTING.md)、運用方針は [docs/git-workflow.md](docs/git-workflow.md) を参照してください。
+
+Pull Request を出す前に、品質ゲートを実行します。
+
+```powershell
+.\scripts\verify.ps1
+```
+
 ## ライセンス
 
 [MIT](LICENSE)
